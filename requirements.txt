@@ -7,3 +7,4 @@ pillow
 aiohttp
 keyboard
 customtkinter
+pytest

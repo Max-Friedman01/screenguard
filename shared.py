@@ -20,7 +20,7 @@ Contract for ai/analyze.py:
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class Box:
     x: int
     y: int
