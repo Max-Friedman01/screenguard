@@ -19,7 +19,7 @@ The JavaScript SDK is the QVAC inference boundary. The Python layer does not cal
 Run the standalone sidecar against the prepared screenshot:
 
 ```powershell
-node .\qvac_sidecar\test_ocr.mjs .\tests\screens\privacy-test.png
+node .\ai\qvac_sidecar\ocr.mjs .\tests\screens\privacy-test.png
 ```
 
 Diagnostics go to stderr. The JSON on stdout contains `status`, OCR text, bounding boxes, and confidence values.
@@ -27,7 +27,7 @@ Diagnostics go to stderr. The JSON on stdout contains `status`, OCR text, boundi
 Run the complete Person A pipeline:
 
 ```powershell
-python .\test_analyze.py .\tests\screens\privacy-test.png
+python -m tests.test_analyze .\tests\screens\privacy-test.png
 ```
 
 The analyzer saves the NumPy image to a temporary PNG, invokes local QVAC OCR, converts QVAC coordinates into `OCRBlock` values, merges adjacent same-line blocks, and applies the email, UK phone, payment-card, postcode, National Insurance, sort-code, and account-number detectors. OCR failures raise an exception so the application can fail closed.
@@ -35,7 +35,7 @@ The analyzer saves the NumPy image to a temporary PNG, invokes local QVAC OCR, c
 Generate a masked demonstration image:
 
 ```powershell
-python .\draw_results.py `
+python -m tests.draw_results `
   .\tests\screens\privacy-test.png `
   .\tests\screens\privacy-test-qvac-masked.png
 ```
