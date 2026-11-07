@@ -6,7 +6,7 @@ const process = globalThis.process ??
 const imagePath = process.argv[2];
 
 if (!imagePath) {
-  console.error('Usage: node qvac_sidecar/test_ocr.mjs <image-path>');
+  console.error('Usage: node ai/qvac_sidecar/ocr.mjs <image-path>');
   process.exitCode = 2;
 } else {
   let modelId;

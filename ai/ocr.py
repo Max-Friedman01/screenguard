@@ -74,7 +74,7 @@ def _run_sidecar(image_path: Path) -> dict[str, Any]:
     environment["QVAC_WORKER_PATH"] = str(_repo_path() / "node_modules" / "@qvac" / "sdk" / "dist" / "src" / "worker" / "index.js")
     environment.setdefault("QVAC_RPC_INIT_TIMEOUT_MS", "120000")
     completed = subprocess.run(
-        [node, str(_repo_path() / "qvac_sidecar" / "test_ocr.mjs"), str(image_path)],
+        [node, str(_repo_path() / "ai" / "qvac_sidecar" / "ocr.mjs"), str(image_path)],
         cwd=str(_repo_path()),
         capture_output=True,
         text=True,
