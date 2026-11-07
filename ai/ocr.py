@@ -3,9 +3,11 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import queue
 import shutil
 import subprocess
 import tempfile
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -96,6 +98,123 @@ def _run_sidecar(image_path: Path) -> dict[str, Any]:
     return result
 
 
+class _PersistentSidecar:
+    """Keeps one Node helper running with the OCR model loaded, so each frame
+    only pays for OCR itself (not Node start-up + model load).
+    Set SCREENGUARD_OCR_ONESHOT=1 to fall back to one process per frame."""
+
+    def __init__(self) -> None:
+        self._proc: subprocess.Popen | None = None
+        self._lines: queue.Queue[str | None] = queue.Queue()
+        self._lock = threading.Lock()
+        self._next_id = 0
+
+    def _start(self) -> None:
+        node = shutil.which("node")
+        if node is None:
+            raise RuntimeError("Node.js is required for the local QVAC OCR sidecar")
+        environment = os.environ.copy()
+        environment["QVAC_WORKER_PATH"] = str(_repo_path() / "node_modules" / "@qvac" / "sdk" / "dist" / "src" / "worker" / "index.js")
+        environment.setdefault("QVAC_RPC_INIT_TIMEOUT_MS", "120000")
+        flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
+        self._proc = subprocess.Popen(
+            [node, str(_repo_path() / "ai" / "qvac_sidecar" / "ocr_server.mjs")],
+            cwd=str(_repo_path()),
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            bufsize=1,
+            env=environment,
+            creationflags=flags,
+        )
+        self._lines = queue.Queue()
+        proc = self._proc
+        threading.Thread(target=self._pump_stdout, args=(proc, self._lines), daemon=True).start()
+        threading.Thread(target=self._pump_stderr, args=(proc,), daemon=True).start()
+
+        ready = self._read(timeout=300)  # first run may download the model
+        if ready.get("status") != "ready":
+            self._kill()
+            raise RuntimeError(f"QVAC OCR helper failed to start: {ready!r}")
+
+    @staticmethod
+    def _pump_stdout(proc: subprocess.Popen, lines: queue.Queue) -> None:
+        for line in proc.stdout:
+            lines.put(line)
+        lines.put(None)  # process ended
+
+    @staticmethod
+    def _pump_stderr(proc: subprocess.Popen) -> None:
+        for line in proc.stderr:
+            line = line.rstrip()
+            if line:
+                print("[ocr]", line)
+
+    def _read(self, timeout: float) -> dict[str, Any]:
+        while True:
+            try:
+                line = self._lines.get(timeout=timeout)
+            except queue.Empty:
+                self._kill()
+                raise RuntimeError("QVAC OCR helper timed out")
+            if line is None:
+                self._kill()
+                raise RuntimeError("QVAC OCR helper exited unexpectedly")
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                return json.loads(line)
+            except json.JSONDecodeError:
+                continue  # ignore any non-JSON noise on stdout
+
+    def _kill(self) -> None:
+        if self._proc is not None:
+            try:
+                self._proc.kill()
+            except OSError:
+                pass
+        self._proc = None
+
+    def ocr_file(self, image_path: Path) -> dict[str, Any]:
+        with self._lock:
+            if self._proc is None or self._proc.poll() is not None:
+                self._start()
+            self._next_id += 1
+            request_id = self._next_id
+            self._proc.stdin.write(json.dumps({"id": request_id, "path": str(image_path)}) + "\n")
+            self._proc.stdin.flush()
+            while True:
+                result = self._read(timeout=180)
+                if result.get("id") == request_id:
+                    break
+            if result.get("status") != "checked":
+                raise RuntimeError(f"QVAC OCR failed: {result.get('error', result)!r}")
+            return result
+
+    def stop(self) -> None:
+        with self._lock:
+            if self._proc is not None and self._proc.poll() is None:
+                try:
+                    self._proc.stdin.close()
+                    self._proc.wait(timeout=10)
+                except (OSError, subprocess.TimeoutExpired):
+                    pass
+            self._kill()
+
+
+_SIDECAR = _PersistentSidecar()
+
+
+def _ocr_file(image_path: Path) -> dict[str, Any]:
+    if os.getenv("SCREENGUARD_OCR_ONESHOT") == "1":
+        return _run_sidecar(image_path)
+    return _SIDECAR.ocr_file(image_path)
+
+
 def _normalise_blocks(result: dict[str, Any], image: np.ndarray) -> list[OCRBlock]:
     image_height, image_width = image.shape[:2]
     normalised: list[OCRBlock] = []
@@ -128,7 +247,7 @@ async def run_ocr(image: np.ndarray) -> list[OCRBlock]:
             temporary_path = Path(temporary_file.name)
         if not cv2.imwrite(str(temporary_path), image):
             raise RuntimeError("OpenCV failed to write temporary OCR image")
-        result = await asyncio.to_thread(_run_sidecar, temporary_path)
+        result = await asyncio.to_thread(_ocr_file, temporary_path)
         return _normalise_blocks(result, image)
     finally:
         if temporary_path is not None:
@@ -143,4 +262,4 @@ async def start_ocr() -> None:
 
 
 async def stop_ocr() -> None:
-    return None
+    await asyncio.to_thread(_SIDECAR.stop)

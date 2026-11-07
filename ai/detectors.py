@@ -40,8 +40,7 @@ UK_POSTCODE_RE = re.compile(
 
 NI_NUMBER_RE = re.compile(
     r"\b"
-    r"(?!BG|GB|KN|NK|NT|TN|ZZ)"
-    r"[A-CEGHJ-PR-TW-Z]{2}"
+    r"(?:QQ|(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z]{2})"
     r"\s?\d{2}\s?\d{2}\s?\d{2}\s?[A-D]"
     r"\b",
     re.IGNORECASE,
