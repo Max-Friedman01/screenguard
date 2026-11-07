@@ -1,0 +1,7 @@
+--find-links https://github.com/tetherto/qvac/releases/expanded_assets/sdk-v0.19.1
+tetherto-qvac-sdk==0.19.1
+mss
+numpy
+opencv-python
+pillow
+aiohttp
