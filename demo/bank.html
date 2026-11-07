@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Northfield Bank - Online Banking (DEMO, fictional bank, fake data)</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: #eef3f1; color: #14211c; }
+  header { background: #0f5c45; color: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
+  header .brand { font-size: 22px; font-weight: 700; }
+  header .who { font-size: 15px; }
+  main { max-width: 1100px; margin: 28px auto; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; padding: 0 20px; }
+  .card { background: #fff; border-radius: 12px; padding: 22px 26px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .card h3 { margin: 0 0 12px; font-size: 17px; color: #0f5c45; }
+  .big { font-size: 34px; font-weight: 700; margin: 6px 0; }
+  .row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #eef0ef; font-size: 16px; }
+  .row:last-child { border-bottom: 0; }
+  .lbl { color: #5a6b64; }
+  .plastic { background: linear-gradient(135deg,#0f5c45,#1f8a68); color: #fff; border-radius: 14px; padding: 22px; font-size: 22px; letter-spacing: 2px; }
+  .plastic .small { font-size: 14px; letter-spacing: 0; opacity: .9; margin-top: 14px; display: flex; justify-content: space-between; }
+  .full { grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Northfield Bank</div>
+  <div class="who">Logged in as Max Fraser · max.fraser@example.com</div>
+</header>
+<main>
+  <div class="card">
+    <h3>Current account</h3>
+    <div class="big">£1,284.37</div>
+    <div class="row"><span class="lbl">Sort code</span><span>12-34-56</span></div>
+    <div class="row"><span class="lbl">Account number</span><span>12345678</span></div>
+    <div class="row"><span class="lbl">IBAN</span><span>GB33 NFBK 1234 5612 3456 78</span></div>
+  </div>
+  <div class="card">
+    <h3>Your debit card</h3>
+    <div class="plastic">
+      4111 1111 1111 1111
+      <div class="small"><span>MAX FRASER</span><span>Expires 09/29</span></div>
+    </div>
+  </div>
+  <div class="card full">
+    <h3>Recent transactions</h3>
+    <div class="row"><span>05 Nov · Transfer to Priya Sharma (sort code 98-76-54, acc 87654321)</span><span>-£25.00</span></div>
+    <div class="row"><span>04 Nov · Card payment 5555 5555 5555 4444 · Tesco Express</span><span>-£12.40</span></div>
+    <div class="row"><span>03 Nov · Payroll, Café ref 4111 1111 1111 1112</span><span>+£310.50</span></div>
+    <div class="row"><span>01 Nov · Phone bill, 07700 900789</span><span>-£15.00</span></div>
+  </div>
+  <div class="card full">
+    <h3>Contact details on file</h3>
+    <div class="row"><span class="lbl">Address</span><span>Flat 4, 21 Oxford Road, Manchester M13 9PL</span></div>
+    <div class="row"><span class="lbl">Mobile</span><span>07700 900456</span></div>
+    <div class="row"><span class="lbl">National Insurance</span><span>QQ 12 34 56 C</span></div>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,98 @@
+{
+  "01_inbox_light.png": {
+    "should_mask": [
+      {
+        "label": "email",
+        "text": "housing@uni-example.ac.uk"
+      },
+      {
+        "label": "email",
+        "text": "max.fraser@example.com"
+      },
+      {
+        "label": "postcode",
+        "text": "M13 9PL"
+      },
+      {
+        "label": "phone",
+        "text": "07700 900456"
+      },
+      {
+        "label": "phone",
+        "text": "020 7946 0321"
+      },
+      {
+        "label": "bank",
+        "text": "12-34-56"
+      },
+      {
+        "label": "bank",
+        "text": "12345678"
+      }
+    ],
+    "decoys": [
+      "4111 1111 1111 1112"
+    ]
+  },
+  "02_bank_light.png": {
+    "should_mask": [
+      {
+        "label": "bank",
+        "text": "12-34-56"
+      },
+      {
+        "label": "bank",
+        "text": "12345678"
+      },
+      {
+        "label": "card",
+        "text": "4111 1111 1111 1111"
+      },
+      {
+        "label": "card",
+        "text": "5555 5555 5555 4444"
+      },
+      {
+        "label": "ni",
+        "text": "QQ 12 34 56 C"
+      }
+    ],
+    "decoys": [
+      "4111 1111 1111 1112"
+    ]
+  },
+  "03_dark_mode_chat.png": {
+    "should_mask": [
+      {
+        "label": "phone",
+        "text": "07700 900123"
+      },
+      {
+        "label": "email",
+        "text": "priya.sharma92@example.com"
+      },
+      {
+        "label": "bank",
+        "text": "98-76-54"
+      },
+      {
+        "label": "bank",
+        "text": "87654321"
+      }
+    ],
+    "decoys": []
+  },
+  "04_small_text_notification.png": {
+    "should_mask": [
+      {
+        "label": "card",
+        "text": "4111 1111 1111 1111"
+      },
+      {
+        "label": "phone",
+        "text": "07700 900123"
+      }
+    ],
+    "decoys": []
+  }
+}

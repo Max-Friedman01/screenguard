@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Postbox - Inbox (DEMO, fake data)</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: #f4f5f7; color: #1d1f23; }
+  header { background: #2d3a8c; color: #fff; padding: 14px 24px; font-size: 20px; font-weight: 600; display: flex; justify-content: space-between; }
+  header span.user { font-weight: 400; font-size: 15px; opacity: .9; }
+  .wrap { display: flex; height: calc(100vh - 54px); }
+  nav { width: 200px; background: #fff; border-right: 1px solid #ddd; padding: 16px; font-size: 15px; }
+  nav div { padding: 8px 6px; border-radius: 6px; }
+  nav .on { background: #e6e9fb; font-weight: 600; }
+  .list { width: 520px; background: #fff; border-right: 1px solid #ddd; overflow: auto; }
+  .mail { padding: 14px 18px; border-bottom: 1px solid #eee; font-size: 15px; }
+  .mail.on { background: #eef1ff; }
+  .from { font-weight: 600; }
+  .addr { color: #555; font-size: 14px; }
+  .subj { margin-top: 4px; }
+  .prev { color: #666; font-size: 14px; margin-top: 2px; }
+  .read { flex: 1; padding: 28px 36px; background: #fff; font-size: 16px; line-height: 1.6; overflow: auto; }
+  .read h2 { margin: 0 0 6px; font-size: 22px; }
+  .meta { color: #555; font-size: 14px; margin-bottom: 18px; }
+  .sig { margin-top: 18px; color: #444; }
+</style>
+</head>
+<body>
+<header>Postbox <span class="user">max.fraser@example.com</span></header>
+<div class="wrap">
+  <nav>
+    <div class="on">Inbox (4)</div>
+    <div>Starred</div>
+    <div>Sent</div>
+    <div>Drafts</div>
+  </nav>
+  <div class="list">
+    <div class="mail on">
+      <div class="from">Accommodation Office</div>
+      <div class="addr">housing@uni-example.ac.uk</div>
+      <div class="subj">Your tenancy details for 2026/27</div>
+      <div class="prev">Please confirm your address and contact number...</div>
+    </div>
+    <div class="mail">
+      <div class="from">Priya Sharma</div>
+      <div class="addr">priya.sharma92@example.com</div>
+      <div class="subj">Group project - call me?</div>
+      <div class="prev">My number is 07700 900123 if Teams is down again</div>
+    </div>
+    <div class="mail">
+      <div class="from">Café Payroll</div>
+      <div class="addr">payroll@cafe-example.co.uk</div>
+      <div class="subj">Payslip and bank details check</div>
+      <div class="prev">NI number QQ 12 34 56 C, sort code 12-34-56...</div>
+    </div>
+    <div class="mail">
+      <div class="from">Mum</div>
+      <div class="addr">jane.fraser@example.com</div>
+      <div class="subj">Your new card</div>
+      <div class="prev">It arrived here: 4111 1111 1111 1111, exp 09/29</div>
+    </div>
+  </div>
+  <div class="read">
+    <h2>Your tenancy details for 2026/27</h2>
+    <div class="meta">From: housing@uni-example.ac.uk &nbsp;·&nbsp; To: max.fraser@example.com</div>
+    <p>Hi Max,</p>
+    <p>Please check the details we hold for you before your tenancy starts:</p>
+    <p>
+      Address: Flat 4, 21 Oxford Road, Manchester M13 9PL<br>
+      Mobile: 07700 900456<br>
+      Emergency contact: Jane Fraser, 020 7946 0321<br>
+      Student ID: 11223344
+    </p>
+    <p>Your deposit of £450 will be refunded to account 12345678, sort code 12-34-56.</p>
+    <p>Order reference (not a card): 4111 1111 1111 1112</p>
+    <p class="sig">Kind regards,<br>Accommodation Office</p>
+  </div>
+</div>
+</body>
+</html>
