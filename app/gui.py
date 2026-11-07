@@ -34,6 +34,19 @@ MUTED = "#9aa0a6"
 CARD = "#23262b"
 
 
+def _free_port(preferred: int) -> int:
+    """preferred if it's free, otherwise any free local port."""
+    import socket
+    for port in (preferred, 0):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.bind(("127.0.0.1", port))
+                return s.getsockname()[1]
+            except OSError:
+                continue
+    return preferred
+
+
 class App(ctk.CTk):
     def __init__(self, fake: bool):
         super().__init__()
@@ -88,6 +101,9 @@ class App(ctk.CTk):
         self.key_entry.pack(side="left", fill="x", expand=True)
         self.copy_btn = ctk.CTkButton(row, text="Copy", width=70, command=self._copy_key, state="disabled")
         self.copy_btn.pack(side="left", padx=(8, 0))
+        self.key_status = ctk.CTkLabel(key_card, text="", text_color=MUTED, wraplength=370, justify="left",
+                                       font=ctk.CTkFont(size=12))
+        self.key_status.pack(anchor="w", padx=12, pady=(0, 8))
 
         ctk.CTkLabel(f, text="What your viewers see", text_color=MUTED).pack(anchor="w", pady=(14, 4))
         blank = Image.new("RGB", (PREVIEW_W, 220), CARD)
@@ -167,7 +183,8 @@ class App(ctk.CTk):
         if not key.startswith("hs://"):
             self.watch_status.configure(text="That doesn't look like a share key (it should start with hs://).")
             return
-        if not self.watch_tunnel.connect(key, VIEW_PORT):
+        self.view_port = _free_port(VIEW_PORT)
+        if not self.watch_tunnel.connect(key, self.view_port):
             self.watch_status.configure(text=self.watch_tunnel.error)
             return
         self.connect_btn.configure(text="Disconnect", fg_color=RED, hover_color=RED_HOVER)
@@ -176,9 +193,9 @@ class App(ctk.CTk):
 
     def _open_viewer(self):
         if self.watch_tunnel.running:
-            webbrowser.open(f"http://127.0.0.1:{VIEW_PORT}/")
+            webbrowser.open(f"http://127.0.0.1:{self.view_port}/")
             self.watch_status.configure(
-                text=f"Connected. Viewing at http://127.0.0.1:{VIEW_PORT}  (refresh if it's blank).")
+                text=f"Connected. Viewing at http://127.0.0.1:{self.view_port}  (refresh if it's blank).")
         else:
             out = "\n".join(self.watch_tunnel.lines[-3:])
             self.watch_status.configure(text=f"Couldn't connect.\n{out}")
@@ -212,8 +229,9 @@ class App(ctk.CTk):
                 self.key_entry.insert(0, key)
                 self.key_entry.configure(state="readonly")
                 self.copy_btn.configure(state="normal")
-            elif not key and self.share_tunnel.error:
-                self.info.configure(text=self.share_tunnel.error)
+            msg = self.share_tunnel.status()
+            if self.key_status.cget("text") != msg:
+                self.key_status.configure(text=msg)
 
             frame = e.preview
             if frame is not None:
@@ -227,13 +245,12 @@ class App(ctk.CTk):
 
             a = e.last_analysis_s
             ai = "fake AI" if e.is_fake else "QVAC, on this laptop"
-            if not (self.share_tunnel.error and not self.share_tunnel.key):
-                self.info.configure(text=f"AI: {ai}  ·  last check {'-' if a is None else f'{a:.1f}s'}"
-                                         f"  ·  {e.n_unchecked} area(s) being checked")
+            self.info.configure(text=f"AI: {ai}  ·  last check {'-' if a is None else f'{a:.1f}s'}"
+                                     f"  ·  {e.n_unchecked} area(s) being checked")
         elif not self._starting:
-            err = self.share_tunnel.error or ""
-            if self.info.cget("text") != err:
-                self.info.configure(text=err)
+            msg = self.share_tunnel.error or ""
+            if self.key_status.cget("text") != msg:
+                self.key_status.configure(text=msg)
 
         self.after(150, self._tick)
 
